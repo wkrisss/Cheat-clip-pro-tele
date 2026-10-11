@@ -128,6 +128,15 @@ async def recover_completed_jobs(app):
 
 
 async def _post_init(app):
+    await app.bot.set_my_commands([
+        ("start", "Mulai bot dan lihat panduan"),
+        ("help", "Panduan lengkap fitur bot"),
+        ("video", "Atur rasio, jumlah, durasi, layout"),
+        ("watermark", "Atur posisi watermark"),
+        ("status", "Lihat status job"),
+        ("settings", "Lihat pengaturan"),
+        ("cancel", "Batalkan job"),
+    ])
     app.create_task(_delivery_loop(app), name="delivery-loop")
     await recover_completed_jobs(app)
 
