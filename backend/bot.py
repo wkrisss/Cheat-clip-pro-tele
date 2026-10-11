@@ -52,6 +52,11 @@ DEFAULT_SETTINGS = {
     "watermark_y": 75.0,
 }
 DEFAULT_SETTINGS.update({
+    "aspect_ratio": os.environ.get("VIDEO_ASPECT_RATIO", DEFAULT_SETTINGS["aspect_ratio"]),
+    "target_clip_count": int(os.environ.get("TARGET_CLIP_COUNT", DEFAULT_SETTINGS["target_clip_count"])),
+    "clip_duration_seconds": int(os.environ.get("CLIP_DURATION_SECONDS", DEFAULT_SETTINGS["clip_duration_seconds"])),
+})
+DEFAULT_SETTINGS.update({
     "watermark_x": float(os.environ.get("WATERMARK_X", DEFAULT_SETTINGS["watermark_x"])),
     "watermark_y": float(os.environ.get("WATERMARK_Y", DEFAULT_SETTINGS["watermark_y"])),
     "watermark_size": float(os.environ.get("WATERMARK_SIZE", DEFAULT_SETTINGS["watermark_size"])),
@@ -234,6 +239,7 @@ async def help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Custom: URL | instruksi untuk AI.\n\n"
             "Admin commands:\n"
             "/setkey gemini KEY\n/setkey supadata KEY\n"
+            "Video: /video 9:16 4 60\n"
             "Upload .txt untuk cookies atau .png/.jpg untuk watermark; nama file otomatis disimpan.\n\n"
             "Watermark: /watermark x y size opacity\n"
             "Contoh: /watermark 50 75 20 80")
@@ -241,6 +247,32 @@ async def help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.edit_message_text(text)
     else:
         await update.message.reply_text(text)
+
+
+async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _is_admin(update):
+        await update.message.reply_text("Not authorized.")
+        return
+    try:
+        ratio, count, duration = context.args
+        if ratio not in {"9:16", "16:9", "1:1", "4:5"}:
+            raise ValueError
+        count = int(count)
+        duration = int(duration)
+        if not (1 <= count <= 20 and 5 <= duration <= 600):
+            raise ValueError
+    except (ValueError, TypeError):
+        await update.message.reply_text("Usage: /video RATIO COUNT DURATION\nExample: /video 9:16 4 60")
+        return
+    DEFAULT_SETTINGS.update({
+        "aspect_ratio": ratio,
+        "target_clip_count": count,
+        "clip_duration_seconds": duration,
+    })
+    for key, value in {"VIDEO_ASPECT_RATIO": ratio, "TARGET_CLIP_COUNT": count, "CLIP_DURATION_SECONDS": duration}.items():
+        _save_env_key(key, str(value))
+        os.environ[key] = str(value)
+    await update.message.reply_text(f"Video settings saved: {ratio}, {count} clips, {duration}s each.")
 
 
 async def set_watermark(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -570,6 +602,7 @@ def main():
     app.add_handler(CommandHandler("settings", settings_menu))
     app.add_handler(CommandHandler("setkey", set_key))
     app.add_handler(CommandHandler("watermark", set_watermark))
+    app.add_handler(CommandHandler("video", set_video))
     app.add_handler(CommandHandler("help", help_menu))
     app.add_handler(CommandHandler("status", status))
     app.add_handler(CommandHandler("cancel", cancel))

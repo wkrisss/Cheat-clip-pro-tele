@@ -101,9 +101,10 @@ async def process_job(job_id: str):
         # Step 1: Analyze transcript with Gemini in-process.
         settings = config.get("settings", {})
         target_count = int(settings.get("target_clip_count", 4))
+        clip_duration = int(settings.get("clip_duration_seconds", 60))
         analysis = await analyze_video_internal(AnalyzeRequest(
             url=video_url,
-            duration="60s",
+            duration=f"{clip_duration}s",
             target_clip_count=target_count,
             custom_prompt=config.get("custom_prompt"),
             api_key=(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or os.environ.get("SUPABASE_SERVICE_KEY")),
