@@ -116,7 +116,26 @@ cookies.txt
 
 Send any `.txt` document directly to the bot as an admin. The bot automatically renames it to `backend/cookies.txt`. Send a `.png`, `.jpg`, `.jpeg`, or `.webp` document to update `backend/assets/watermark_logo.png`. Telegram messages are deleted after upload. New renders use the uploaded watermark. Never upload cookies in a group or commit the file.
 
-### Video settings from Telegram
+### Telegram command reference
+
+Send `/help` to see this inside Telegram. Admin commands:
+
+```text
+/video RATIO COUNT DURATION [LAYOUT]
+/video 9:16 4 60 none
+/video 9:16 4 60 split_top_cam
+```
+
+`none` keeps normal portrait layout. `split_top_cam` puts detected facecam on top and gameplay/reaction below. It works best when facecam is a distinct region in the source video.
+
+Watermark:
+
+```text
+/watermark X Y SIZE OPACITY
+/watermark 50 75 20 80
+```
+
+All values use percent `0-100`. `X` controls left-to-right position (`0` left, `50` center, `100` right). `Y` controls top-to-bottom position (`0` top, `50` center, `100` bottom). `SIZE` controls watermark size. `OPACITY` controls visibility (`100` fully visible, `0` invisible).
 
 Admin can change output ratio, clip count, and duration without editing server files:
 

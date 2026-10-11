@@ -237,14 +237,27 @@ async def set_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = ("ℹ️ Cheat Clip Pro\n\n"
-            "Kirim URL YouTube untuk auto-clip.\n"
-            "Custom: URL | instruksi untuk AI.\n\n"
-            "Admin commands:\n"
-            "/setkey gemini KEY\n/setkey supadata KEY\n"
-            "Video: /video 9:16 4 60\n"
-            "Upload .txt untuk cookies atau .png/.jpg untuk watermark; nama file otomatis disimpan.\n\n"
-            "Watermark: /watermark x y size opacity\n"
-            "Contoh: /watermark 50 75 20 80")
+            "AUTO CLIP\n"
+            "Kirim URL YouTube saja. AI pilih momen dari transcript.\n\n"
+            "CUSTOM CLIP\n"
+            "Format: URL | instruksi untuk AI\n"
+            "Contoh: URL | cari momen lucu, sertakan konteks 5 detik sebelum dan sesudah.\n\n"
+            "VIDEO\n"
+            "/video RASIO JUMLAH DURASI [LAYOUT]\n"
+            "Contoh normal: /video 9:16 4 60 none\n"
+            "Contoh facecam: /video 9:16 4 60 split_top_cam\n"
+            "Rasio: 9:16, 16:9, 1:1, 4:5. Durasi dalam detik.\n"
+            "none = layout biasa, split_top_cam = facecam atas + gameplay bawah.\n\n"
+            "WATERMARK\n"
+            "/watermark X Y SIZE OPACITY\n"
+            "Semua angka persen 0-100. X=posisi kiri-kanan; Y=posisi atas-bawah.\n"
+            "X 0 kiri, 50 tengah, 100 kanan. Y 0 atas, 50 tengah, 100 bawah.\n"
+            "SIZE=ukuran watermark; OPACITY=transparansi (100 terlihat penuh).\n"
+            "Contoh: /watermark 50 75 20 80\n\n"
+            "UPLOAD\n"
+            ".txt = cookies.txt. .png/.jpg/.jpeg/.webp = watermark.\n\n"
+            "ADMIN\n"
+            "/setkey gemini KEY\n/setkey supadata KEY")
     if update.callback_query:
         await update.callback_query.edit_message_text(text)
     else:
