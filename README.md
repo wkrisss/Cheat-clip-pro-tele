@@ -43,8 +43,8 @@ The instruction guides AI. AI still reads transcript/context and returns timesta
 ### 1. Clone
 
 ```bash
-git clone https://github.com/galihjuansaputra/cheat-clip-pro-tele.git
-cd cheat-clip-pro-tele
+git clone https://github.com/wkrisss/Cheat-clip-pro-tele.git
+cd Cheat-clip-pro-tele
 ```
 
 ### 2. Install FFmpeg
