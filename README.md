@@ -116,6 +116,17 @@ cookies.txt
 
 Send any `.txt` document directly to the bot as an admin. The bot automatically renames it to `backend/cookies.txt`. Send a `.png`, `.jpg`, `.jpeg`, or `.webp` document to update `backend/assets/watermark_logo.png`. Telegram messages are deleted after upload. New renders use the uploaded watermark. Never upload cookies in a group or commit the file.
 
+### Video settings from Telegram
+
+Admin can change output ratio, clip count, and duration without editing server files:
+
+```text
+/video 9:16 4 60
+```
+
+Format: `/video RATIO COUNT DURATION_SECONDS`.
+Supported ratios: `9:16`, `16:9`, `1:1`, `4:5`. Count supports `1-20`; duration supports `5-600` seconds. Settings persist in `backend/.env` and apply to new jobs.
+
 The cookies belong to your own account. Use them only where you have permission.
 
 ```text
