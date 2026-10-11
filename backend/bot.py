@@ -55,6 +55,7 @@ DEFAULT_SETTINGS.update({
     "aspect_ratio": os.environ.get("VIDEO_ASPECT_RATIO", DEFAULT_SETTINGS["aspect_ratio"]),
     "target_clip_count": int(os.environ.get("TARGET_CLIP_COUNT", DEFAULT_SETTINGS["target_clip_count"])),
     "clip_duration_seconds": int(os.environ.get("CLIP_DURATION_SECONDS", DEFAULT_SETTINGS["clip_duration_seconds"])),
+    "streamer_preset": os.environ.get("STREAMER_PRESET", "none"),
 })
 DEFAULT_SETTINGS.update({
     "watermark_x": float(os.environ.get("WATERMARK_X", DEFAULT_SETTINGS["watermark_x"])),
@@ -147,7 +148,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "1. Admin kirim /setkey gemini API_KEY\n"
         "2. Admin kirim /setkey supadata API_KEY (opsional)\n"
         "3. Admin kirim file cookies YouTube .txt (opsional)\n"
-        "4. Atur watermark: /watermark 50 75 20 80\n\n"
+        "4. Atur watermark: /watermark 50 75 20 80\n"
+        "5. Atur video: /video 9:16 4 60 split_top_cam\n   (rasio, jumlah klip, durasi, layout facecam atas)\n\n"
         "Auto clip:\n"
         "Kirim URL YouTube.\n\n"
         "Custom clip:\n"
@@ -254,8 +256,9 @@ async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Not authorized.")
         return
     try:
-        ratio, count, duration = context.args
-        if ratio not in {"9:16", "16:9", "1:1", "4:5"}:
+        ratio, count, duration, *layout = context.args
+        preset = layout[0] if layout else "none"
+        if ratio not in {"9:16", "16:9", "1:1", "4:5"} or preset not in {"none", "split_top_cam"}:
             raise ValueError
         count = int(count)
         duration = int(duration)
@@ -268,8 +271,9 @@ async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "aspect_ratio": ratio,
         "target_clip_count": count,
         "clip_duration_seconds": duration,
+        "streamer_preset": preset,
     })
-    for key, value in {"VIDEO_ASPECT_RATIO": ratio, "TARGET_CLIP_COUNT": count, "CLIP_DURATION_SECONDS": duration}.items():
+    for key, value in {"VIDEO_ASPECT_RATIO": ratio, "TARGET_CLIP_COUNT": count, "CLIP_DURATION_SECONDS": duration, "STREAMER_PRESET": preset}.items():
         _save_env_key(key, str(value))
         os.environ[key] = str(value)
     await update.message.reply_text(f"Video settings saved: {ratio}, {count} clips, {duration}s each.")

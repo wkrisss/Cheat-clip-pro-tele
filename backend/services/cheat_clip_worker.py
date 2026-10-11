@@ -136,7 +136,8 @@ async def process_job(job_id: str):
         
         render_settings = dict(config.get("render_settings", config.get("settings", {})))
         # Worker jobs created before aspect-ratio support lack this field.
-        render_settings["aspect_ratio"] = "9:16"
+        render_settings["aspect_ratio"] = settings.get("aspect_ratio", "9:16")
+        render_settings["streamer_preset"] = settings.get("streamer_preset", os.environ.get("STREAMER_PRESET", "none"))
         render_settings["caption_style"] = "none"
         render_settings["title_position"] = "none"
         render_request = RenderBatchRequest(
