@@ -159,7 +159,7 @@ Send `/help` to see this inside Telegram. Admin commands:
 /video 9:16 4 60 split_top_cam
 ```
 
-`none` keeps normal portrait layout. `split_top_cam` puts detected facecam on top and gameplay/reaction below. It works best when facecam is a distinct region in the source video.
+Layout options (3): `none` keeps normal portrait layout; `split_top_cam` puts detected facecam on top and gameplay/reaction below; `pip_corner` puts detected facecam in a small corner overlay. These work best when facecam is a distinct region in the source video.
 
 Watermark:
 

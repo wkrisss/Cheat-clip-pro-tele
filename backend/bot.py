@@ -255,8 +255,9 @@ async def help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/video RASIO JUMLAH DURASI [LAYOUT]\n"
             "Contoh normal: /video 9:16 4 60 none\n"
             "Contoh facecam: /video 9:16 4 60 split_top_cam\n"
-            "Rasio: 9:16, 16:9, 1:1, 4:5. Durasi dalam detik.\n"
-            "none = layout biasa, split_top_cam = facecam atas + gameplay bawah.\n\n"
+            "Rasio (4 pilihan): 9:16, 16:9, 1:1, 4:5. Durasi dalam detik.\n"
+            "Layout (3 pilihan): none = normal, split_top_cam = facecam atas + gameplay bawah, pip_corner = facecam kecil di sudut.\n"
+            "Posisi facecam source: auto-detect dipakai otomatis; layout Telegram belum menerima posisi manual.\n\n"
             "WATERMARK\n"
             "/watermark X Y SIZE OPACITY\n"
             "Semua angka persen 0-100. X=posisi kiri-kanan; Y=posisi atas-bawah.\n"
@@ -280,7 +281,7 @@ async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         ratio, count, duration, *layout = context.args
         preset = layout[0] if layout else "none"
-        if ratio not in {"9:16", "16:9", "1:1", "4:5"} or preset not in {"none", "split_top_cam"}:
+        if ratio not in {"9:16", "16:9", "1:1", "4:5"} or preset not in {"none", "split_top_cam", "pip_corner"}:
             raise ValueError
         count = int(count)
         duration = int(duration)
