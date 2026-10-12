@@ -347,26 +347,26 @@ async def render_merged_batch_clips(
         if len(part_paths) == 1:
             raw_merged_path = part_paths[0]
         else:
-            inputs = []
-            filter_parts = []
-            for idx_p, p in enumerate(part_paths):
-                inputs.extend(["-i", p])
-                filter_parts.append(f"[{idx_p}:v][{idx_p}:a]")
-            filter_str = f"{''.join(filter_parts)}concat=n={len(part_paths)}:v=1:a=1[v][a]"
+            # concat demuxer keeps one input open at a time; filter_complex opens all
+            # segments together and can exhaust small server RAM.
+            list_path = str(TEMP_DIR / f"{batch_id}_concat.txt")
+            with open(list_path, "w", encoding="utf-8") as f:
+                for p in part_paths:
+                    f.write("file " + repr(os.path.abspath(p)) + "\n")
             concat_cmd = [
                 "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-                *inputs,
-                "-filter_complex", filter_str,
-                "-map", "[v]", "-map", "[a]",
-                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18",
-                "-c:a", "aac", "-b:a", "192k",
-                "-avoid_negative_ts", "make_zero",
-                "-movflags", "+faststart",
-                raw_merged_path
+                "-f", "concat", "-safe", "0", "-i", list_path,
+                "-c", "copy", "-movflags", "+faststart", raw_merged_path
             ]
             concat_timeout = max(180, total_segments * 60)
-            logger.info(f"Concatenating {len(part_paths)} segments into {raw_merged_path}")
-            await asyncio.to_thread(subprocess.run, concat_cmd, check=True, timeout=concat_timeout)
+            logger.info(f"Concatenating {len(part_paths)} segments with concat demuxer")
+            try:
+                await asyncio.to_thread(subprocess.run, concat_cmd, check=True, timeout=concat_timeout)
+            finally:
+                try:
+                    os.unlink(list_path)
+                except OSError:
+                    pass
 
         # 3. Transcribe & generate time-shifted subtitles
         total_duration_sec = 0.0
