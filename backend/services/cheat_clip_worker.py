@@ -139,6 +139,10 @@ async def process_job(job_id: str):
         render_settings["aspect_ratio"] = settings.get("aspect_ratio", "9:16")
         render_settings["streamer_preset"] = settings.get("streamer_preset", os.environ.get("STREAMER_PRESET", "none"))
         render_settings["render_mode"] = settings.get("render_mode", os.environ.get("RENDER_MODE", "separate"))
+        watermark_path = Path(str(render_settings.get("watermark_file_path", "")))
+        if not watermark_path.is_file():
+            fallback = Path(__file__).resolve().parents[1] / "assets" / "watermark_logo.png"
+            render_settings["watermark_file_path"] = str(fallback) if fallback.is_file() else None
         render_settings["caption_style"] = "none"
         render_settings["title_position"] = "none"
         render_request = RenderBatchRequest(

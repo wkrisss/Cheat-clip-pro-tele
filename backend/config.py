@@ -49,8 +49,13 @@ load_dotenv()
 
 ROOT_DIR = Path(_base_dir).parent
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# Setup logging: keep traceback after SSH/session restart.
+LOG_PATH = ROOT_DIR / "backend.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler(LOG_PATH, encoding="utf-8")],
+)
 logger = logging.getLogger("cheat-clip-pro")
 
 
