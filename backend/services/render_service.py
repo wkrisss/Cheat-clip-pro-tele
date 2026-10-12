@@ -335,9 +335,27 @@ async def render_merged_batch_clips(
                 raise RuntimeError(
                     f"Segment #{i+1} ({s_t:.1f}s - {e_t:.1f}s) is incomplete or corrupted. Please retry rendering."
                 )
-            part_paths.append(p_path)
+            # Normalize each segment before concat; yt-dlp can return different
+            # stream metadata across timestamps, which makes stream-copy concat fail.
+            normalized_path = str(TEMP_DIR / f"{batch_id}_part_{i}_normalized.mp4")
+            normalize_cmd = [
+                "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+                "-i", p_path,
+                "-vf", "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black",
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "28",
+                "-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "128k",
+                "-movflags", "+faststart", normalized_path,
+            ]
+            await asyncio.to_thread(subprocess.run, normalize_cmd, check=True, timeout=max(180, int((e_t - s_t) * 8)))
+            if not os.path.exists(normalized_path) or not is_valid_mp4(normalized_path):
+                raise RuntimeError(f"Segment #{i+1} normalization failed")
+            try:
+                os.unlink(p_path)
+            except OSError:
+                pass
+            part_paths.append(normalized_path)
 
-        # 2. Concatenate raw video segments
+        # 2. Concatenate normalized segments
         clip_status["status"] = "transcribing"
         clip_status["progress_percent"] = 40
 
