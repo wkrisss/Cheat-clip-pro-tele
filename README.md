@@ -34,6 +34,7 @@ Pengaturan video harus memakai command terpisah:
 ```text
 /video 9:16 4 60 none
 /video 9:16 4 60 split_top_cam
+/video 9:16 4 60 pip_corner
 ```
 
 `9:16` adalah rasio video, `4` jumlah klip, `60` durasi tiap klip dalam detik. `none` layout normal; `split_top_cam` layout facecam atas dan gameplay/reaction bawah. Jadi, instruksi seperti “buat portrait” tidak mengganti rasio yang tersimpan; gunakan `/video`.
@@ -157,6 +158,7 @@ Send `/help` to see this inside Telegram. Admin commands:
 /video RATIO COUNT DURATION [LAYOUT]
 /video 9:16 4 60 none
 /video 9:16 4 60 split_top_cam
+/video 9:16 4 60 pip_corner
 ```
 
 Layout options (3): `none` keeps normal portrait layout; `split_top_cam` puts detected facecam on top and gameplay/reaction below; `pip_corner` puts detected facecam in a small corner overlay. These work best when facecam is a distinct region in the source video.
