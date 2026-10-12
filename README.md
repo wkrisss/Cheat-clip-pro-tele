@@ -4,6 +4,26 @@ AI-powered Telegram bot that turns YouTube videos into short vertical clips.
 
 This repository is the maintained Telegram release by `wkrisss`. Backend and frontend are included in this same repository; no separate backend download is required.
 
+## Ringkasan Bahasa Indonesia
+
+Repo ini berisi backend dan frontend dalam satu paket. Tidak perlu download backend dari repo lain. Clone repo ini, jalankan `./install.sh`, lalu jalankan `./start-bot.sh`. Setup awal hanya meminta Telegram bot token. Gemini dan Supadata key dapat diatur lewat Telegram setelah bot aktif.
+
+Mode penggunaan:
+
+- **Auto clip:** kirim URL YouTube saja.
+- **Custom clip:** kirim `URL | instruksi untuk AI`.
+- **Atur video:** `/video 9:16 4 60 none`.
+- **Layout facecam:** `/video 9:16 4 60 split_top_cam`.
+- **Atur watermark:** `/watermark 50 75 20 80`.
+- **Upload cookies:** kirim file `.txt`; bot menyimpannya sebagai `backend/cookies.txt`.
+- **Upload watermark:** kirim `.png`, `.jpg`, `.jpeg`, atau `.webp`.
+- **Web UI:** jalankan `npm run dev`, lalu buka `http://localhost:5173`. Web UI sudah termasuk repo ini.
+
+Lihat bagian instalasi dan referensi command untuk detail lengkap.
+
+English documentation follows below.
+
+
 Features:
 
 - Automatic AI clip selection from transcript/script
@@ -186,11 +206,18 @@ The bot must run as `python -m backend.bot` from project root. Run only one bot 
 
 ### 8. Start web UI (optional)
 
+Web UI sudah termasuk dalam repo ini. Jalankan dari root project:
+
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Buka `http://localhost:5173`.
+
+Referensi web UI/original project:
+https://github.com/galihjuansaputra/cheat-clip-pro
+
+Repo asli hanya untuk referensi sumber. Untuk instalasi versi Telegram ini, clone repo `wkrisss` di atas.
 
 ## Output defaults
 
