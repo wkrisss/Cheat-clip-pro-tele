@@ -43,9 +43,10 @@ DEFAULT_SETTINGS = {
     "clip_duration_seconds": 60,
     "target_file_size_mb": 20,
     "send_separately": True,
+    "render_mode": "separate",
     "watermark_enabled": True,
     "watermark_type": "image",
-    "watermark_file_path": "/home/wahyu/cheat-clip-pro/backend/assets/watermark_logo.png",
+    "watermark_file_path": str(Path(__file__).parent / "assets" / "watermark_logo.png"),
     "watermark_size": 20.0,
     "watermark_opacity": 80.0,
     "watermark_x": 50.0,
@@ -184,7 +185,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def _is_admin(update):
     admins = {x.strip() for x in os.environ.get("TELEGRAM_ADMIN_IDS", "").split(",") if x.strip()}
-    return not admins or str(update.effective_user.id) in admins
+    return bool(admins) and str(update.effective_user.id) in admins
 
 
 def _save_env_key(name, value):

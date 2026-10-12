@@ -192,8 +192,8 @@ async def worker_loop():
                     if job_id in _active_jobs:
                         continue  # Already processing
                     set_active_job(job_id, {"status": "processing"})
-                    logger.info(f"[Worker] Creating task for job {job_id}")
-                    asyncio.create_task(process_job(job_id))
+                    logger.info(f"[Worker] Processing job {job_id} exclusively")
+                    await process_job(job_id)
             else:
                 logger.debug("[Worker] No pending jobs, sleeping 2s")
             
