@@ -90,21 +90,13 @@ npm install
 
 ### 5. Configure environment
 
+Do not create or commit `backend/.env` manually. Run the bot launcher once; setup asks only for the Telegram bot token and creates `backend/.env` with restrictive permissions:
+
 ```bash
-cp backend/.env.template backend/.env
+./start-bot.sh
 ```
 
-Set values in `backend/.env`:
-
-```env
-GOOGLE_API_KEY=your_gemini_key
-# or GEMINI_API_KEY=your_gemini_key
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-BACKEND_URL=http://127.0.0.1:8000
-
-# Optional transcript provider
-SUPADATA_API_KEY=your_supadata_key
-```
+Set Gemini and Supadata keys later from a private Telegram chat with the admin commands below. `BACKEND_URL` defaults to `http://127.0.0.1:8000` and can be set in the local `.env` if needed.
 
 Never commit `backend/.env`, API keys, Telegram tokens, cookies, databases, logs, or rendered videos.
 
@@ -273,4 +265,3 @@ Changes in this repository include Telegram-first setup, Telegram API-key config
 MIT. See `LICENSE`.
 
 Third-party services and downloaded content remain subject to their own terms. Users are responsible for copyright, platform rules, campaign briefs, and API usage.
-# Cheat-clip-pro-tele
