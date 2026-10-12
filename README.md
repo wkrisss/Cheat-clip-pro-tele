@@ -19,6 +19,25 @@ Mode penggunaan:
 - **Upload watermark:** kirim `.png`, `.jpg`, `.jpeg`, atau `.webp`.
 - **Web UI:** jalankan `npm run dev`, lalu buka `http://localhost:5173`. Web UI sudah termasuk repo ini.
 
+### Instruksi AI dalam Bahasa Indonesia
+
+Mode custom menerima instruksi Bahasa Indonesia maupun Bahasa Inggris:
+
+```text
+URL | cari momen lucu, ambil konteks sebelum dan sesudah, dan sertakan facecam
+```
+
+AI membaca transcript/konteks lalu memilih timestamp. Instruksi ini hanya mengatur **isi dan momen** yang dicari. Instruksi tidak mengubah model video, rasio, ukuran output, jumlah klip, durasi, watermark, atau layout.
+
+Pengaturan video harus memakai command terpisah:
+
+```text
+/video 9:16 4 60 none
+/video 9:16 4 60 split_top_cam
+```
+
+`9:16` adalah rasio video, `4` jumlah klip, `60` durasi tiap klip dalam detik. `none` layout normal; `split_top_cam` layout facecam atas dan gameplay/reaction bawah. Jadi, instruksi seperti “buat portrait” tidak mengganti rasio yang tersimpan; gunakan `/video`.
+
 Lihat bagian instalasi dan referensi command untuk detail lengkap.
 
 English documentation follows below.
@@ -284,6 +303,7 @@ This project is based on the original Cheat Clip Pro codebase by `galihjuansaput
 
 - Original repository: https://github.com/galihjuansaputra/cheat-clip-pro
 - Telegram release and deployment changes: `wkrisss`
+- Some modifications were developed with AI assistance and reviewed/managed by `wkrisss`.
 
 Changes in this repository include Telegram-first setup, Telegram API-key configuration, cookie and watermark uploads, Telegram video settings, split facecam layout support, queue/worker integration, and installation documentation. Original notices and license terms remain in `LICENSE`.
 
