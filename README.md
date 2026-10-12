@@ -163,6 +163,20 @@ Send `/help` to see this inside Telegram. Admin commands:
 
 Layout options (3): `none` keeps normal portrait layout; `split_top_cam` puts detected facecam on top and gameplay/reaction below; `pip_corner` puts detected facecam in a small corner overlay. These work best when facecam is a distinct region in the source video.
 
+Output mode options:
+
+- `separate` sends each selected clip as its own video.
+- `merged` joins all selected clips into one compilation video.
+
+Examples:
+
+```text
+/video 9:16 4 60 split_top_cam separate
+/video 9:16 4 60 split_top_cam merged
+```
+
+Use format `/video RATIO COUNT DURATION [LAYOUT] [MODE]`. `merged` combines clips; it does not combine the original full video.
+
 Watermark:
 
 ```text

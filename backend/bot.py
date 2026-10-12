@@ -56,6 +56,7 @@ DEFAULT_SETTINGS.update({
     "target_clip_count": int(os.environ.get("TARGET_CLIP_COUNT", DEFAULT_SETTINGS["target_clip_count"])),
     "clip_duration_seconds": int(os.environ.get("CLIP_DURATION_SECONDS", DEFAULT_SETTINGS["clip_duration_seconds"])),
     "streamer_preset": os.environ.get("STREAMER_PRESET", "none"),
+    "render_mode": os.environ.get("RENDER_MODE", "separate"),
 })
 DEFAULT_SETTINGS.update({
     "watermark_x": float(os.environ.get("WATERMARK_X", DEFAULT_SETTINGS["watermark_x"])),
@@ -252,10 +253,11 @@ async def help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Format: URL | instruksi untuk AI\n"
             "Contoh: URL | cari momen lucu, sertakan konteks 5 detik sebelum dan sesudah.\n\n"
             "VIDEO\n"
-            "/video RASIO JUMLAH DURASI [LAYOUT]\n"
-            "Contoh normal: /video 9:16 4 60 none\n"
-            "Contoh facecam atas: /video 9:16 4 60 split_top_cam\n"
-            "Contoh facecam sudut: /video 9:16 4 60 pip_corner\n"
+            "/video RASIO JUMLAH DURASI [LAYOUT] [MODE]\n"
+            "Contoh normal: /video 9:16 4 60 none separate\n"
+            "Contoh facecam atas: /video 9:16 4 60 split_top_cam separate\n"
+            "Contoh gabung: /video 9:16 4 60 split_top_cam merged\n"
+            "Contoh facecam sudut: /video 9:16 4 60 pip_corner separate\n"
             "Rasio (4 pilihan): 9:16, 16:9, 1:1, 4:5. Durasi dalam detik.\n"
             "Layout (3 pilihan): none = normal, split_top_cam = facecam atas + gameplay bawah, pip_corner = facecam kecil di sudut.\n"
             "Posisi facecam source: auto-detect dipakai otomatis; layout Telegram belum menerima posisi manual.\n\n"
@@ -280,9 +282,10 @@ async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Not authorized.")
         return
     try:
-        ratio, count, duration, *layout = context.args
-        preset = layout[0] if layout else "none"
-        if ratio not in {"9:16", "16:9", "1:1", "4:5"} or preset not in {"none", "split_top_cam", "pip_corner"}:
+        ratio, count, duration, *options = context.args
+        preset = options[0] if options else "none"
+        mode = options[1] if len(options) > 1 else "separate"
+        if ratio not in {"9:16", "16:9", "1:1", "4:5"} or preset not in {"none", "split_top_cam", "pip_corner"} or mode not in {"separate", "merged"}:
             raise ValueError
         count = int(count)
         duration = int(duration)
@@ -296,8 +299,9 @@ async def set_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "target_clip_count": count,
         "clip_duration_seconds": duration,
         "streamer_preset": preset,
+        "render_mode": mode,
     })
-    for key, value in {"VIDEO_ASPECT_RATIO": ratio, "TARGET_CLIP_COUNT": count, "CLIP_DURATION_SECONDS": duration, "STREAMER_PRESET": preset}.items():
+    for key, value in {"VIDEO_ASPECT_RATIO": ratio, "TARGET_CLIP_COUNT": count, "CLIP_DURATION_SECONDS": duration, "STREAMER_PRESET": preset, "RENDER_MODE": mode}.items():
         _save_env_key(key, str(value))
         os.environ[key] = str(value)
     await update.message.reply_text(f"Video settings saved: {ratio}, {count} clips, {duration}s each.")
