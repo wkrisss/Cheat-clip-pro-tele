@@ -2,6 +2,8 @@
 
 AI-powered Telegram bot that turns YouTube videos into short vertical clips.
 
+This repository is the maintained Telegram release by `wkrisss`. Backend and frontend are included in this same repository; no separate backend download is required.
+
 Features:
 
 - Automatic AI clip selection from transcript/script
@@ -256,6 +258,15 @@ If YouTube blocks downloads, provide a valid `cookies.txt` locally. Do not commi
 backend_venv/bin/python -m py_compile backend/bot.py backend/services/cheat_clip_worker.py backend/video_engine.py
 npm run build
 ```
+
+## Attribution
+
+This project is based on the original Cheat Clip Pro codebase by `galihjuansaputra`:
+
+- Original repository: https://github.com/galihjuansaputra/cheat-clip-pro
+- Telegram release and deployment changes: `wkrisss`
+
+Changes in this repository include Telegram-first setup, Telegram API-key configuration, cookie and watermark uploads, Telegram video settings, split facecam layout support, queue/worker integration, and installation documentation. Original notices and license terms remain in `LICENSE`.
 
 ## License
 
