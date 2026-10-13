@@ -987,15 +987,8 @@ async def analyze_video(request: AnalyzeRequest):
         discovered_flash = await asyncio.to_thread(get_flash_models_for_key, client)
         
         # Build models_to_try (capped at top 4 to prevent prolonged delays):
-        models_to_try = [requested_model]
-        for fm in discovered_flash:
-            if fm not in models_to_try:
-                models_to_try.append(fm)
-        for km in KNOWN_FLASH_MODELS:
-            if km not in models_to_try:
-                models_to_try.append(km)
-
-        models_to_try = models_to_try[:4]
+        # Prefer stable known models over newly discovered preview models.
+        models_to_try = list(dict.fromkeys(KNOWN_FLASH_MODELS + [requested_model] + discovered_flash))[:4]
         logger.info(f"Flash fallback chain prepared: {models_to_try}")
 
         response = None
