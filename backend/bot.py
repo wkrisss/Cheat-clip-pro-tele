@@ -68,29 +68,11 @@ DEFAULT_SETTINGS.update({
 
 # In-memory job tracking for active Telegram sessions
 active_jobs: Dict[str, Dict[str, Any]] = {}
+delivery_blocked: set[str] = set()
 
 
 async def _log_bot_error(update: object, context: ContextTypes.DEFAULT_TYPE):
     logger.exception("Telegram update failed", exc_info=context.error)
-
-
-async def recover_completed_jobs(app):
-    """Deliver completed files after bot restart, once paths still exist."""
-    for job in get_all_jobs():
-        if job.get("status") != "completed" or not job.get("output_paths"):
-            continue
-        try:
-            paths = json.loads(job["output_paths"])
-            existing = [p for p in paths if Path(p).is_file()]
-            if not existing:
-                continue
-            for path in existing:
-                with open(path, "rb") as video:
-                    await app.bot.send_video(chat_id=int(job["user_id"]), video=video, supports_streaming=True)
-                Path(path).unlink(missing_ok=True)
-            await app.bot.send_message(chat_id=int(job["user_id"]), text=f"🎉 Job `{job['id']}` selesai. {len(existing)} video dikirim.", parse_mode="Markdown")
-        except Exception:
-            logger.exception("Failed recovering completed job %s", job.get("id"))
 
 
 async def _delivery_loop(app):
@@ -111,22 +93,30 @@ async def _post_shutdown(app):
 
 
 async def recover_completed_jobs(app):
-    """Deliver completed files after bot restart or late worker completion."""
+    """Deliver completed files once; block jobs that Telegram rejects."""
     for job in get_all_jobs():
-        if job.get("status") != "completed" or not job.get("output_paths"):
+        job_id = str(job.get("id"))
+        if job_id in delivery_blocked or job.get("status") != "completed" or not job.get("output_paths"):
             continue
         try:
             paths = json.loads(job["output_paths"])
             existing = [p for p in paths if Path(p).is_file()]
             if not existing:
                 continue
+            sent = 0
             for path in existing:
-                with open(path, "rb") as video:
-                    await app.bot.send_video(chat_id=int(job["user_id"]), video=video, supports_streaming=True)
-                Path(path).unlink(missing_ok=True)
-            await app.bot.send_message(chat_id=int(job["user_id"]), text=f"🎉 Job `{job['id']}` selesai. {len(existing)} video dikirim.", parse_mode="Markdown")
+                try:
+                    with open(path, "rb") as video:
+                        await app.bot.send_video(chat_id=int(job["user_id"]), video=video, supports_streaming=True)
+                    Path(path).unlink(missing_ok=True)
+                    sent += 1
+                except Exception:
+                    logger.exception("Failed sending %s for job %s", path, job_id)
+            delivery_blocked.add(job_id)
+            await app.bot.send_message(chat_id=int(job["user_id"]), text=f"🎉 Job `{job_id}` selesai. {sent}/{len(existing)} video dikirim.")
         except Exception:
-            logger.exception("Failed recovering completed job %s", job.get("id"))
+            delivery_blocked.add(job_id)
+            logger.exception("Failed recovering completed job %s; delivery blocked until restart", job_id)
 
 
 async def _post_init(app):
@@ -448,15 +438,7 @@ async def monitor_job(job_id: str, chat_id: int, message_id: int, bot):
             except Exception:
                 logger.exception("Progress message update failed for %s", job_id)
         if status == "completed":
-            paths = json.loads(job.get("output_paths") or "[]")
-            sent = 0
-            for path in paths:
-                if Path(path).is_file():
-                    with open(path, "rb") as video:
-                        await bot.send_video(chat_id=chat_id, video=video, supports_streaming=True)
-                    Path(path).unlink(missing_ok=True)
-                    sent += 1
-            await bot.send_message(chat_id=chat_id, text=f"🎉 Job `{job_id}` selesai. {sent} video dikirim.", parse_mode="Markdown")
+            # Delivery loop is single source of truth; avoid duplicate/racing sends.
             return
         if status == "failed":
             return
