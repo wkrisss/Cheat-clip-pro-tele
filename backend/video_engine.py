@@ -2872,7 +2872,7 @@ def render_clip_to_mp4(
             wm_idx = input_idx_counter
             input_idx_counter += 1
             # Keep PNG input alive for full render duration; single-frame image otherwise has no usable stream.
-            extra_input_args.extend(["-loop", "1", "-i", str(watermark_image_path)])
+            extra_input_args.extend(["-loop", "1", "-framerate", "1", "-i", str(watermark_image_path)])
 
             # Canvas width is 1920 for landscape or 1080 for vertical. Calculate watermark width based on percentage (0-500%)
             canvas_w = 1920 if aspect_ratio == "16:9_landscape" else 1080
